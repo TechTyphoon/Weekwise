@@ -2,7 +2,7 @@ import Header from "@/components/header";
 import Loader from "@/components/loader";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
-import type { trpc } from "@/utils/trpc";
+import { trpc, trpcClient, queryClient } from "@/utils/trpc";
 import type { QueryClient } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import {
@@ -46,22 +46,26 @@ function RootComponent() {
 	});
 
 	return (
-		<>
+		<trpc.Provider client={trpcClient} queryClient={queryClient}>
 			<HeadContent />
 			<ThemeProvider
 				attribute="class"
 				defaultTheme="dark"
+				enableSystem={true}
 				disableTransitionOnChange
 				storageKey="vite-ui-theme"
 			>
-				<div className="grid grid-rows-[auto_1fr] h-svh">
+				{/* Root layout uses flexible column instead of fixed viewport height to avoid scroll trapping */}
+				<div className="flex min-h-svh flex-col">
 					<Header />
-					{isFetching ? <Loader /> : <Outlet />}
+					<div className="flex-1 flex flex-col">
+						{isFetching ? <Loader /> : <Outlet />}
+					</div>
 				</div>
 				<Toaster richColors />
 			</ThemeProvider>
 			<TanStackRouterDevtools position="bottom-left" />
 			<ReactQueryDevtools position="bottom" buttonPosition="bottom-right" />
-		</>
+		</trpc.Provider>
 	);
 }

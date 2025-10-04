@@ -1,7 +1,7 @@
 import type { AppRouter } from "../../../server/src/routers";
 import { QueryCache, QueryClient } from "@tanstack/react-query";
 import { createTRPCClient, httpBatchLink } from "@trpc/client";
-import { createTRPCOptionsProxy } from "@trpc/tanstack-react-query";
+import { createTRPCReact } from "@trpc/react-query";
 import { toast } from "sonner";
 
 export const queryClient = new QueryClient({
@@ -19,10 +19,13 @@ export const queryClient = new QueryClient({
 	}),
 });
 
-export const trpcClient = createTRPCClient<AppRouter>({
+export const trpc = createTRPCReact<AppRouter>();
+
+// Vanilla tRPC client for imperative calls (outside hooks)
+export const vanillaTrpc = createTRPCClient<AppRouter>({
 	links: [
 		httpBatchLink({
-			url: `${import.meta.env.VITE_SERVER_URL}/trpc`,
+			url: `${import.meta.env.VITE_SERVER_URL || 'http://localhost:3000'}/trpc`,
 			fetch(url, options) {
 				return fetch(url, {
 					...options,
@@ -33,7 +36,16 @@ export const trpcClient = createTRPCClient<AppRouter>({
 	],
 });
 
-export const trpc = createTRPCOptionsProxy<AppRouter>({
-	client: trpcClient,
-	queryClient,
+export const trpcClient = trpc.createClient({
+	links: [
+		httpBatchLink({
+			url: `${import.meta.env.VITE_SERVER_URL || 'http://localhost:3000'}/trpc`,
+			fetch(url, options) {
+				return fetch(url, {
+					...options,
+					credentials: "include",
+				});
+			},
+		}),
+	],
 });

@@ -3,7 +3,21 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>assignment</title>
+    <title>Weekwise</title>
+    <script>
+      // Prevent flash of wrong theme by applying it immediately
+      (function() {
+        const storageKey = 'vite-ui-theme';
+        const theme = localStorage.getItem(storageKey) || 'dark';
+        const root = document.documentElement;
+        
+        if (theme === 'dark' || (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+          root.classList.add('dark');
+        } else {
+          root.classList.remove('dark');
+        }
+      })();
+    </script>
   </head>
 
   <body>

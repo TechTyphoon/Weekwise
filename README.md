@@ -1,71 +1,66 @@
-# assignment
+# Scheduler
 
-This project was created with [Better-T-Stack](https://github.com/AmanVarshney01/create-better-t-stack), a modern TypeScript stack that combines React, TanStack Router, Hono, TRPC, and more.
+Weekly time slot management system with recurring schedules.
+
+## Stack
+
+- React 19 + TypeScript
+- Hono + tRPC
+- Prisma + PostgreSQL
+- Better Auth
+
+## Setup
+
+1. Clone and install:
+```bash
+git clone <repo-url>
+cd assignment
+bun install
+```
+
+2. Configure environment (`apps/server/.env`):
+```env
+DATABASE_URL="postgresql://user:pass@host:5432/db"
+CORS_ORIGIN="http://localhost:3001"
+BETTER_AUTH_SECRET="your-secret"
+BETTER_AUTH_URL="http://localhost:3000"
+```
+
+3. Setup database:
+```bash
+bun run db:push
+```
+
+4. Start dev servers:
+```bash
+bun run dev
+```
+
+Frontend: http://localhost:3001  
+Backend: http://localhost:3000
 
 ## Features
 
-- **TypeScript** - For type safety and improved developer experience
-- **TanStack Router** - File-based routing with full type safety
-- **TailwindCSS** - Utility-first CSS for rapid UI development
-- **shadcn/ui** - Reusable UI components
-- **Hono** - Lightweight, performant server framework
-- **tRPC** - End-to-end type-safe APIs
-- **Bun** - Runtime environment
-- **Prisma** - TypeScript-first ORM
-- **PostgreSQL** - Database engine
-- **Authentication** - Better-Auth
-- **Turborepo** - Optimized monorepo build system
-
-## Getting Started
-
-First, install the dependencies:
-
-```bash
-bun install
-```
-## Database Setup
-
-This project uses PostgreSQL with Prisma.
-
-1. Make sure you have a PostgreSQL database set up.
-2. Update your `apps/server/.env` file with your PostgreSQL connection details.
-
-3. Generate the Prisma client and push the schema:
-```bash
-bun db:push
-```
-
-
-Then, run the development server:
-
-```bash
-bun dev
-```
-
-Open [http://localhost:3001](http://localhost:3001) in your browser to see the web application.
-The API is running at [http://localhost:3000](http://localhost:3000).
-
-
-
-
-
-
+- Recurring weekly schedules
+- Exception handling (edit/delete specific dates)
+- Up to 2 slots per day
+- Infinite scroll week navigation
+- Authentication
 
 ## Project Structure
 
 ```
-assignment/
-├── apps/
-│   ├── web/         # Frontend application (React + TanStack Router)
-│   └── server/      # Backend API (Hono, TRPC)
+apps/
+├── server/    # Hono API + tRPC
+└── web/       # React frontend
 ```
 
-## Available Scripts
+## Scripts
 
-- `bun dev`: Start all applications in development mode
-- `bun build`: Build all applications
-- `bun dev:web`: Start only the web application
-- `bun dev:server`: Start only the server
-- `bun check-types`: Check TypeScript types across all apps
-- `bun db:push`: Push schema changes to database
-- `bun db:studio`: Open database studio UI
+```bash
+bun run dev          # Start all
+bun run dev:server   # Backend only
+bun run dev:web      # Frontend only
+bun run db:push      # Update database
+bun run db:studio    # Prisma studio
+```

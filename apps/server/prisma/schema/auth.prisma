@@ -8,6 +8,7 @@ model User {
   updatedAt     DateTime
   sessions      Session[]
   accounts      Account[]
+  schedules     Schedule[]
 
   @@unique([email])
   @@map("user")
@@ -56,4 +57,34 @@ model Verification {
   updatedAt  DateTime?
 
   @@map("verification")
+}
+
+model Schedule {
+  id          Int       @id @default(autoincrement())
+  userId      String
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  dayOfWeek   Int       // 0 = Sunday, 1 = Monday, ..., 6 = Saturday
+  startTime   String    // Format: "HH:MM"
+  endTime     String    // Format: "HH:MM"
+  isActive    Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  exceptions  ScheduleException[]
+
+  @@map("schedule")
+}
+
+model ScheduleException {
+  id         Int       @id @default(autoincrement())
+  scheduleId Int
+  schedule   Schedule  @relation(fields: [scheduleId], references: [id], onDelete: Cascade)
+  date       DateTime  // Specific date for the exception
+  startTime  String?   // If null, slot is deleted for this date
+  endTime    String?   // If null, slot is deleted for this date
+  isDeleted  Boolean   @default(false) // True if slot is deleted for this date
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+
+  @@unique([scheduleId, date])
+  @@map("schedule_exception")
 }

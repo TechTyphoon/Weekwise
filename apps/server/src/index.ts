@@ -1,4 +1,3 @@
-import "dotenv/config";
 import { trpcServer } from "@hono/trpc-server";
 import { createContext } from "./lib/context";
 import { appRouter } from "./routers/index";
@@ -13,14 +12,21 @@ app.use(logger());
 app.use(
 	"/*",
 	cors({
-		origin: process.env.CORS_ORIGIN || "",
-		allowMethods: ["GET", "POST", "OPTIONS"],
-		allowHeaders: ["Content-Type", "Authorization"],
+		origin: ["http://localhost:3001", "http://localhost:3002", "http://127.0.0.1:3001", "http://127.0.0.1:3002"],
+		allowMethods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+		allowHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
 		credentials: true,
 	}),
 );
 
-app.on(["POST", "GET"], "/api/auth/*", (c) => auth.handler(c.req.raw));
+app.on(["POST", "GET"], "/api/auth/*", async (c) => {
+	try {
+		return await auth.handler(c.req.raw);
+	} catch (error) {
+		console.error("Auth error:", error);
+		return c.json({ error: "Authentication failed", details: error instanceof Error ? error.message : String(error) }, 500);
+	}
+});
 
 app.use(
 	"/trpc/*",
@@ -35,5 +41,47 @@ app.use(
 app.get("/", (c) => {
 	return c.text("OK");
 });
+
+const port = process.env.PORT || 3000;
+
+console.log(`🚀 Server starting on port ${port}`);
+
+// Start server (Bun native or Node.js fallback)
+if (import.meta.main) {
+	if (typeof Bun !== 'undefined') {
+		// Use Bun's built-in server
+		Bun.serve({
+			fetch: app.fetch,
+			port: Number(port),
+		});
+		console.log(`Started development server: http://localhost:${port}`);
+	} else {
+		// Fallback for Node.js runtime
+		const { createServer } = await import('http');
+		const server = createServer(async (req, res) => {
+			const url = new URL(req.url!, `http://${req.headers.host}`);
+			const request = new Request(url.toString(), {
+				method: req.method,
+				headers: req.headers as any,
+				// @ts-ignore - Node.js IncomingMessage compatibility
+				body: req.method !== 'GET' && req.method !== 'HEAD' ? req : undefined,
+			});
+			
+			const response = await app.fetch(request);
+			
+			res.statusCode = response.status;
+			response.headers.forEach((value, key) => {
+				res.setHeader(key, value);
+			});
+			
+			const body = await response.text();
+			res.end(body);
+		});
+		
+		server.listen(Number(port), () => {
+			console.log(`🚀 Server running on http://localhost:${port}`);
+		});
+	}
+}
 
 export default app;

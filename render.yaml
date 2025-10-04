@@ -1,0 +1,20 @@
+services:
+  - type: web
+    name: scheduler-backend
+    runtime: node
+    repo: # Your GitHub repo URL will go here
+    region: singapore
+    plan: free
+    branch: main
+    rootDir: apps/server
+    buildCommand: bun install && bun run build && bun run db:generate
+    startCommand: bun run start
+    envVars:
+      - key: DATABASE_URL
+        sync: false
+      - key: CORS_ORIGIN
+        sync: false
+      - key: BETTER_AUTH_SECRET
+        sync: false
+      - key: BETTER_AUTH_URL
+        sync: false
