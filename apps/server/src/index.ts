@@ -9,10 +9,16 @@ import { logger } from "hono/logger";
 const app = new Hono();
 
 app.use(logger());
+
+// CORS configuration - use environment variable in production
+const corsOrigins = process.env.CORS_ORIGIN 
+	? process.env.CORS_ORIGIN.split(",").map(origin => origin.trim())
+	: ["http://localhost:3001", "http://localhost:3002", "http://127.0.0.1:3001", "http://127.0.0.1:3002"];
+
 app.use(
 	"/*",
 	cors({
-		origin: ["http://localhost:3001", "http://localhost:3002", "http://127.0.0.1:3001", "http://127.0.0.1:3002"],
+		origin: corsOrigins,
 		allowMethods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
 		allowHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
 		credentials: true,
@@ -43,8 +49,10 @@ app.get("/", (c) => {
 });
 
 const port = process.env.PORT || 3000;
+const hostname = process.env.HOST || "0.0.0.0";
 
-console.log(`🚀 Server starting on port ${port}`);
+console.log(`🚀 Server starting on ${hostname}:${port}`);
+console.log(`📍 Environment: ${process.env.NODE_ENV || 'development'}`);
 
 // Start server (Bun native or Node.js fallback)
 if (import.meta.main) {
@@ -53,8 +61,9 @@ if (import.meta.main) {
 		Bun.serve({
 			fetch: app.fetch,
 			port: Number(port),
+			hostname: hostname,
 		});
-		console.log(`Started development server: http://localhost:${port}`);
+		console.log(`✅ Bun server running on http://${hostname}:${port}`);
 	} else {
 		// Fallback for Node.js runtime
 		const { createServer } = await import('http');
