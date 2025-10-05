@@ -48,6 +48,10 @@ app.get("/", (c) => {
 	return c.text("OK");
 });
 
+app.get("/health", (c) => {
+	return c.json({ status: "healthy", timestamp: new Date().toISOString() });
+});
+
 const port = process.env.PORT || 3000;
 const hostname = process.env.HOST || "0.0.0.0";
 
