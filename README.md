@@ -1,6 +1,18 @@
-# Scheduler
+# Weekwise
 
-Weekly time slot management system with recurring schedules.
+Modern recurring schedule management system.
+
+## 🌐 Live Demo
+
+**[https://weekwise-five.vercel.app](https://weekwise-five.vercel.app)**
+
+## 📸 Screenshots
+
+### Home Page
+![Home Page](./image.png)
+
+### Scheduler Interface
+![Scheduler](./Image2.png)
 
 ## Stack
 
