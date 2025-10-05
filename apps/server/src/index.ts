@@ -54,8 +54,8 @@ const hostname = process.env.HOST || "0.0.0.0";
 console.log(`🚀 Server starting on ${hostname}:${port}`);
 console.log(`📍 Environment: ${process.env.NODE_ENV || 'development'}`);
 
-// Start server (Bun native or Node.js fallback)
-if (import.meta.main) {
+// Start server - check for Bun runtime first, then fallback to Node.js
+const startServer = async () => {
 	if (typeof Bun !== 'undefined') {
 		// Use Bun's built-in server
 		Bun.serve({
@@ -87,10 +87,16 @@ if (import.meta.main) {
 			res.end(body);
 		});
 		
-		server.listen(Number(port), () => {
-			console.log(`🚀 Server running on http://localhost:${port}`);
+		server.listen(Number(port), hostname, () => {
+			console.log(`✅ Node.js server running on http://${hostname}:${port}`);
 		});
 	}
-}
+};
+
+// Start the server
+startServer().catch((error) => {
+	console.error('❌ Failed to start server:', error);
+	process.exit(1);
+});
 
 export default app;
