@@ -72,23 +72,45 @@ const startServer = async () => {
 		// Fallback for Node.js runtime
 		const { createServer } = await import('http');
 		const server = createServer(async (req, res) => {
-			const url = new URL(req.url!, `http://${req.headers.host}`);
-			const request = new Request(url.toString(), {
-				method: req.method,
-				headers: req.headers as any,
-				// @ts-ignore - Node.js IncomingMessage compatibility
-				body: req.method !== 'GET' && req.method !== 'HEAD' ? req : undefined,
-			});
-			
-			const response = await app.fetch(request);
-			
-			res.statusCode = response.status;
-			response.headers.forEach((value, key) => {
-				res.setHeader(key, value);
-			});
-			
-			const body = await response.text();
-			res.end(body);
+			try {
+				const url = new URL(req.url!, `http://${req.headers.host}`);
+				
+				// Build request options for Node.js 20+ compatibility
+				const requestInit: RequestInit = {
+					method: req.method,
+					headers: req.headers as any,
+				};
+				
+				// Handle request body for POST/PUT/PATCH methods
+				if (req.method && !['GET', 'HEAD'].includes(req.method)) {
+					const chunks: Buffer[] = [];
+					for await (const chunk of req) {
+						chunks.push(chunk);
+					}
+					const bodyBuffer = Buffer.concat(chunks);
+					
+					if (bodyBuffer.length > 0) {
+						requestInit.body = bodyBuffer;
+						// Required for Node.js 20+ when sending body
+						(requestInit as any).duplex = 'half';
+					}
+				}
+				
+				const request = new Request(url.toString(), requestInit);
+				const response = await app.fetch(request);
+				
+				res.statusCode = response.status;
+				response.headers.forEach((value, key) => {
+					res.setHeader(key, value);
+				});
+				
+				const body = await response.text();
+				res.end(body);
+			} catch (error) {
+				console.error('Request handling error:', error);
+				res.statusCode = 500;
+				res.end('Internal Server Error');
+			}
 		});
 		
 		server.listen(Number(port), hostname, () => {
