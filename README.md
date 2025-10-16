@@ -20,6 +20,7 @@ Modern recurring schedule management system.
 - Hono + tRPC
 - Prisma + PostgreSQL
 - Better Auth
+- Firebase (Auth + Firestore) for real-time data
 
 ## Setup
 
@@ -30,13 +31,28 @@ cd assignment
 bun install
 ```
 
-2. Configure environment (`apps/server/.env`):
+2. Configure environment:
+
+**Server** (`apps/server/.env`):
 ```env
 DATABASE_URL="postgresql://user:pass@host:5432/db"
 CORS_ORIGIN="http://localhost:3001"
 BETTER_AUTH_SECRET="your-secret"
 BETTER_AUTH_URL="http://localhost:3000"
 ```
+
+**Web** (`apps/web/.env`):
+```env
+VITE_SERVER_URL=http://localhost:3000
+VITE_FIREBASE_API_KEY=your-firebase-api-key
+VITE_FIREBASE_AUTH_DOMAIN=your-project.firebaseapp.com
+VITE_FIREBASE_PROJECT_ID=your-project-id
+VITE_FIREBASE_STORAGE_BUCKET=your-project.appspot.com
+VITE_FIREBASE_MESSAGING_SENDER_ID=your-sender-id
+VITE_FIREBASE_APP_ID=your-app-id
+```
+
+See `apps/web/FIREBASE.md` for detailed Firebase setup instructions.
 
 3. Setup database:
 ```bash
@@ -57,7 +73,10 @@ Backend: http://localhost:3000
 - Exception handling (edit/delete specific dates)
 - Up to 2 slots per day
 - Infinite scroll week navigation
-- Authentication
+- Authentication (Better Auth + Firebase)
+- Real-time data dashboard with Firestore
+- Live alerts and events feed
+- Anonymous and email/password auth support
 
 ## Project Structure
 
