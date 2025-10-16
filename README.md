@@ -53,11 +53,23 @@ Backend: http://localhost:3000
 
 ## Features
 
+### Weekwise Scheduler
 - Recurring weekly schedules
 - Exception handling (edit/delete specific dates)
 - Up to 2 slots per day
 - Infinite scroll week navigation
 - Authentication
+
+### Whale & Dump Dashboard
+- Real-time crypto alerts via Firestore
+- Multi-chain support (Ethereum, BSC, Polygon, Arbitrum, Optimism, Avalanche)
+- AI-powered analysis and summaries
+- Advanced filtering (chain, alert type, severity, token search)
+- Responsive card/list views
+- Detailed transaction and wallet inspection
+- Historical context and patterns
+
+See [apps/web/DASHBOARD.md](apps/web/DASHBOARD.md) for dashboard documentation.
 
 ## Project Structure
 
